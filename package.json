@@ -1,0 +1,29 @@
+{
+  "name": "azure-signature",
+  "version": "1.0.0",
+  "description": "Helps you sign Microsoft Azure requests",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 0;"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gammasoft/azure-signature.git"
+  },
+  "keywords": [
+    "microsoft",
+    "azure",
+    "requests",
+    "signature",
+    "hmac",
+    "sas",
+    "shared",
+    "key"
+  ],
+  "author": "Renato Gama <renato@gammasoft.com.br>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gammasoft/azure-signature/issues"
+  },
+  "homepage": "https://github.com/gammasoft/azure-signature"
+}
