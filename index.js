@@ -3,7 +3,7 @@
 var crypto = require('crypto');
 
 function canonicalizeHeaders(headers) {
-    if(!headers) {
+    if(!headers || !Object.keys(headers).length) {
         return '';
     }
 
@@ -18,28 +18,36 @@ function canonicalizeHeaders(headers) {
     }).join('\n') + '\n';
 }
 
-function getSignature(params) {
-    var signature = [
-            params.verb.toUpperCase(),
-            params.contentEncoding || '',
-            params.contentLanguage || '',
-            params.contentLength || '',
-            params.contentMD || '',
-            params.contentType || '',
-            params.date || '',
-            params.ifModifiedSince || '',
-            params.ifMatch || '',
-            params.ifNoneMatch || '',
-            params.ifUnmodifiedSince || '',
-            params.Range || '',
-            canonicalizeHeaders(params.customHeaders) +
-            params.resource.canonicalize()
-        ].join('\n'),
-        key = new Buffer(params.key, 'base64');
+function getSignature(request, key) {
+    var decodedKey = new Buffer(key, 'base64'),
+        hmac = crypto.createHmac('sha256', decodedKey);
 
-    return crypto.createHmac('sha256', key)
-                    .update(signature, 'utf-8')
-                    .digest('base64');
+    hmac.update(request, 'utf-8');
+    return hmac.digest('base64');
 }
 
-module.exports = getSignature;
+function calculate(request, key) {
+    var stringToSign = [
+        request.verb.toUpperCase(),
+        request.contentEncoding || '',
+        request.contentLanguage || '',
+        request.contentLength || '',
+        request.contentMD5 || '',
+        request.contentType || '',
+        request.date || '',
+        request.ifModifiedSince || '',
+        request.ifMatch || '',
+        request.ifNoneMatch || '',
+        request.ifUnmodifiedSince || '',
+        request.range || '',
+        canonicalizeHeaders(request.customHeaders) +
+        request.resource.canonicalize()
+    ].join('\n');
+
+    return getSignature(stringToSign, key);
+}
+
+module.exports.calculate = calculate;
+module.exports.resources = {
+    Blob: require('./resources/blob')
+};
